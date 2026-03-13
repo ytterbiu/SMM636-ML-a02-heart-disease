@@ -1,0 +1,9 @@
+
+project:
+  type: default
+  output-dir: _output
+ 
+# Project-level defaults (can be overridden per-document)
+execute:
+  freeze: auto
+ 

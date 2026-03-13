@@ -2,7 +2,21 @@
 .vscode/*
 .venv
 submission-documents/
-_resources
+_resources/
+# hidden fig for now - can remove later if change to qaurto/rmd
+fig/ 
+
+# Quarto output
+quarto/_output/
+quarto/.quarto/
+quarto/*_files/
+#! check below when pushing to github
+quarto/_freeze/ 
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
 
 # user settings
 .*DS_Store/*
@@ -40,3 +54,4 @@ _resources
 peer-assessment/*
 
 # cached files
+quarto/SMM636-a02-SubmissionForm.pdf
