@@ -1,11 +1,13 @@
 # Heart Disease Prediction Shiny App
 
-<!-- This project implements tree-based machine learning models to predict the
-presence of heart disease using the Cleveland dataset. This was part of a group
-project at Bayes Business School (Term 2 2025-26) for module SMM636 Machine
-Learning. -->
+Term 2 individual project for Machine Learning (50% of coursework grade). 
+This was part of a project at Bayes Business School (Term 2 2025-26) for 
+module SMM636 Machine Learning.
 
-TBI
+> [!IMPORTANT] 
+> HTML report: https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/ 
+
+## R Shiny App (basic dashboard)
 
 ## Project structure
 
