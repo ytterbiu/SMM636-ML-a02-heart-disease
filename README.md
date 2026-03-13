@@ -26,6 +26,15 @@ project/
 
 ## Rendering
 
+Using make file (easiest)
+
+```zsh
+make #(or make all): Builds the PDF, HTML, and Word docs.
+make pdf  #Builds only the PDF (fastest for checking your work).
+make py #Runs the Jupyter conversion script.
+make clean #Wipes the generated files.
+```
+
 From the `quarto/` directory:
 
 ```bash
@@ -38,14 +47,7 @@ quarto render report.qmd --to html
 quarto render report.qmd --to docx
 ```
 
-```zsh
-make #(or make all): Builds the PDF, HTML, and Word docs.
-make pdf  #Builds only the PDF (fastest for checking your work).
-make py #Runs the Jupyter conversion script.
-make clean #Wipes the generated files.
-```
-
-PDF requires XeLaTeX and fonts described in `premable.tex`.
+PDF requires XeLaTeX and fonts in `premable.tex`.
 
 ## Converting .py to .ipynb
 
