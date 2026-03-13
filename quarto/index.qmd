@@ -52,16 +52,266 @@ df = pd.read_csv("../data/heart-disease.csv")
 
 # Exploratory data analysis {#sec-exploratory-data-analysis}
 
-The dataset comprises 462 adult males from Western
+The dataset comprises 462 adult males from a high-risk region of the Western
 Cape, South Africa, with no missing values across nine predictors and a binary
-target (`chd`). The distribution is 302 controls
-(65.4%) versus 160 CHD-positive cases (34.6%). 
-
-We know from @zhu2020adjusting,
+target (`chd`). The class distribution is moderately imbalanced: 302 controls
+(65.4%) versus 160 CHD-positive cases (34.6%). Following @zhu2020adjusting,
 the effective severity of class imbalance depends jointly on the ratio and the
-feature dimensionality. Here, with only $p = 9$ predictors, this imbalance is
-relatively minor therefore no required synthetic oversampling...
+feature dimensionality; with only $p = 9$ predictors, this imbalance is
+relatively benign and does not necessitate synthetic oversampling.
 
+Adding some text for _flavour_...
+
+::: {layout-ncol=2}
+
+```{python}
+#| label: fig-histograms
+#| fig-cap: "Feature distributions by CHD status"
+#| fig-width: 3.4
+#| fig-height: 2.8
+
+continuous_cols = ["sbp", "tobacco", "ldl", "adiposity",
+                   "typea", "obesity", "alcohol", "age"]
+fig, axes = plt.subplots(2, 4, figsize=(3.4, 2.8))
+for ax, col in zip(axes.ravel(), continuous_cols):
+    for label, colour in [(0, "steelblue"), (1, "tomato")]:
+        ax.hist(df[df["chd"] == label][col], bins=15, alpha=0.5,
+                label=f"CHD={label}", color=colour, density=True)
+    ax.set_title(col, fontsize=5, pad=2)
+    ax.tick_params(labelsize=4, length=2)
+    ax.set_yticks([])
+axes[0, 0].legend(fontsize=4, loc="upper right")
+plt.tight_layout(pad=0.3)
+plt.show()
+```
+
+```{python}
+#| label: fig-correlation
+#| fig-cap: "Pearson correlation matrix"
+#| fig-width: 3.4
+#| fig-height: 2.8
+
+df_corr = df.copy()
+df_corr["famhist"] = LabelEncoder().fit_transform(df_corr["famhist"])
+fig, ax = plt.subplots(figsize=(3.4, 2.8))
+sns.heatmap(df_corr.corr(), annot=True, fmt=".2f", cmap="coolwarm",
+            center=0, ax=ax, square=True, linewidths=0.5,
+            annot_kws={"size": 5}, cbar_kws={"shrink": 0.7})
+ax.tick_params(labelsize=5)
+plt.tight_layout(pad=0.3)
+plt.show()
+```
+
+:::
+
+The correlation matrix (@fig-correlation) reveals substantial collinearity
+between adiposity and obesity ($r = 0.72$), motivating L2 regularisation.
+Age, tobacco, and LDL show the strongest marginal associations with CHD,
+while family history carries a markedly higher CHD prevalence among those
+with a positive record.
+
+```{python}
+#| label: data-prep
+#| include: false
+
+# Encode famhist: Absent → 0, Present → 1
+df["famhist"] = LabelEncoder().fit_transform(df["famhist"])
+X = df.drop("chd", axis=1)
+y = df["chd"]
+
+# 80/20 stratified split preserves class proportions
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=SEED, stratify=y)
+
+# Scaler fitted on training data only to prevent leakage
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Common CV strategy across all models
+cv = StratifiedKFold(n_splits=10, shuffle=True, random_state=SEED)
+```
+
+Data preparation encodes `famhist` as binary (Present = 1) and applies an
+80/20 stratified train–test split (369 training, 93 test). Features are
+$z$-standardised using training-set parameters only, preventing data leakage.
+
+# Ridge Logistic Regression {#sec-ridge}
+
+To address the adiposity–obesity collinearity, logistic regression with an L2
+(ridge) penalty serves as the baseline. The L2 term shrinks correlated
+coefficients toward each other rather than discarding either, preserving
+their shared biological variance while stabilising estimates. The
+regularisation strength $C$ (inverse penalty) is tuned via 10-fold stratified
+cross-validation over 20 logarithmically spaced values in $[10^{-4},\, 10^{4}]$.
+
+```{python}
+#| label: ridge-fit
+#| include: false
+
+param_grid_lr = {"C": np.logspace(-4, 4, 20)}
+grid_lr = GridSearchCV(
+    LogisticRegression(penalty="l2", solver="lbfgs", max_iter=1000,
+                       random_state=SEED),
+    param_grid_lr, cv=cv, scoring="accuracy", n_jobs=-1)
+grid_lr.fit(X_train_scaled, y_train)
+best_lr = grid_lr.best_estimator_
+y_pred_lr = best_lr.predict(X_test_scaled)
+acc_lr = accuracy_score(y_test, y_pred_lr)
+```
+
+The optimal $C = 0.616$ yields a CV accuracy of 74.3% and a test accuracy of
+**74.2%**. @fig-coefficients displays the standardised coefficients: age is
+the dominant predictor (0.70), followed by family history (0.43), LDL (0.39),
+Type-A behaviour (0.36), and tobacco (0.31). Obesity and adiposity receive
+near-zero coefficients — the ridge penalty distributes their shared effect
+rather than arbitrarily selecting one, as an L1 (lasso) penalty would.
+
+```{python}
+#| label: fig-coefficients
+#| fig-cap: "Standardised ridge coefficients. Age, family history, LDL, and tobacco are the primary linear risk drivers."
+#| fig-width: 4.5
+#| fig-height: 2.4
+
+coef_df = pd.DataFrame({
+    "Feature": X.columns,
+    "Coefficient": best_lr.coef_[0]
+}).sort_values("Coefficient")
+fig, ax = plt.subplots(figsize=(4.5, 2.4))
+colours = ["tomato" if c > 0 else "steelblue" for c in coef_df["Coefficient"]]
+ax.barh(coef_df["Feature"], coef_df["Coefficient"], color=colours, height=0.6)
+ax.set_xlabel("Standardised Coefficient", fontsize=8)
+ax.axvline(0, color="black", linewidth=0.8)
+ax.tick_params(labelsize=7)
+plt.tight_layout()
+plt.show()
+```
+
+# Alternative Classifiers and Model Selection {#sec-alternatives}
+
+Three alternatives were evaluated, each motivated by a distinct modelling
+assumption:
+
+- **K-Nearest Neighbours (KNN):** a non-parametric, distance-based method
+  that captures local structure. However, overlapping clinical profiles degrade
+  KNN in even moderate dimensions [@zhu2017orthogonal].
+- **Random Forest (RF):** a bootstrap-aggregated ensemble of decision trees
+  with feature subspace randomisation, capable of modelling non-linear
+  interactions without explicit kernel specification.
+- **SVM (RBF kernel):** projects inputs into a high-dimensional feature
+  space via the kernel trick to find a maximum-margin hyperplane;
+  @asimit2022robust examined SVMs from a robustness perspective under
+  distributional uncertainty.
+
+All models were tuned via the same 10-fold stratified CV framework used for
+the ridge baseline.
+
+```{python}
+#| label: model-fits
+#| include: false
+
+# KNN
+grid_knn = GridSearchCV(
+    KNeighborsClassifier(),
+    {"n_neighbors": list(range(3, 31, 2)),
+     "weights": ["uniform", "distance"]},
+    cv=cv, scoring="accuracy", n_jobs=-1)
+grid_knn.fit(X_train_scaled, y_train)
+acc_knn = accuracy_score(y_test,
+    grid_knn.best_estimator_.predict(X_test_scaled))
+
+# Random Forest
+grid_rf = GridSearchCV(
+    RandomForestClassifier(random_state=SEED),
+    {"n_estimators": [100, 200, 300],
+     "max_depth": [3, 5, 7, None],
+     "min_samples_split": [2, 5, 10]},
+    cv=cv, scoring="accuracy", n_jobs=-1)
+grid_rf.fit(X_train_scaled, y_train)
+acc_rf = accuracy_score(y_test,
+    grid_rf.best_estimator_.predict(X_test_scaled))
+
+# SVM
+grid_svm = GridSearchCV(
+    SVC(kernel="rbf", random_state=SEED, probability=True),
+    {"C": [0.1, 1, 10, 100],
+     "gamma": ["scale", "auto", 0.01, 0.1]},
+    cv=cv, scoring="accuracy", n_jobs=-1)
+grid_svm.fit(X_train_scaled, y_train)
+acc_svm = accuracy_score(y_test,
+    grid_svm.best_estimator_.predict(X_test_scaled))
+```
+
+```{python}
+#| label: tbl-comparison
+#| tbl-cap: "Model comparison. Ridge LR achieves the highest test accuracy with the smallest CV–test gap."
+
+comparison = pd.DataFrame({
+    "Model": ["Ridge LR", "SVM (RBF)", "Random Forest", "KNN"],
+    "Best hyperparameters": [
+        f"C = {grid_lr.best_params_['C']:.3f}",
+        f"C = {grid_svm.best_params_['C']}, gamma = {grid_svm.best_params_['gamma']}",
+        f"depth = {grid_rf.best_params_['max_depth']}, n = {grid_rf.best_params_['n_estimators']}",
+        f"k = {grid_knn.best_params_['n_neighbors']}, wt = {grid_knn.best_params_['weights']}"
+    ],
+    "CV Acc.": [f"{grid_lr.best_score_:.3f}", f"{grid_svm.best_score_:.3f}",
+                f"{grid_rf.best_score_:.3f}", f"{grid_knn.best_score_:.3f}"],
+    "Test Acc.": [f"{acc_lr:.3f}", f"{acc_svm:.3f}",
+                  f"{acc_rf:.3f}", f"{acc_knn:.3f}"]
+})
+from IPython.display import Markdown
+Markdown(comparison.to_markdown(index=False))
+```
+
+Ridge logistic regression achieves the highest test accuracy (74.2%) with the
+smallest CV-to-test gap, indicating strong generalisation. SVM-RBF has
+marginally higher CV accuracy (74.8%) but drops to 72.0% on the held-out set
+— consistent with mild overfitting on $n = 462$ samples. The Random Forest's
+optimal depth of 3 suggests the underlying signal is low-complexity, further
+supporting linear dominance. KNN performs worst, consistent with
+distance-based methods struggling when class-conditional distributions
+overlap [@zhu2017orthogonal].
+
+```{python}
+#| label: fig-roc
+#| fig-cap: "ROC curves. Ridge LR achieves the highest AUC (0.818) and generalises most stably."
+#| fig-width: 4.2
+#| fig-height: 2.8
+
+fig, ax = plt.subplots(figsize=(4.2, 2.8))
+models = {"Ridge LR": best_lr, "KNN": grid_knn.best_estimator_,
+          "Random Forest": grid_rf.best_estimator_,
+          "SVM (RBF)": grid_svm.best_estimator_}
+for name, model in models.items():
+    y_prob = model.predict_proba(X_test_scaled)[:, 1]
+    fpr, tpr, _ = roc_curve(y_test, y_prob)
+    auc = roc_auc_score(y_test, y_prob)
+    ax.plot(fpr, tpr, label=f"{name} (AUC={auc:.3f})", linewidth=1.2)
+ax.plot([0, 1], [0, 1], "k--", alpha=0.4, linewidth=0.8)
+ax.set_xlabel("False Positive Rate", fontsize=8)
+ax.set_ylabel("True Positive Rate", fontsize=8)
+ax.legend(fontsize=6, loc="lower right")
+ax.tick_params(labelsize=7)
+plt.tight_layout()
+plt.show()
+```
+
+SMOTE was deliberately not applied. The 65:35 class ratio with $p = 9$ features
+falls within the regime identified by @zhu2020adjusting where dimensionality
+renders the imbalance manageable without synthetic augmentation. The
+minority-class recall of 0.62 confirms adequate sensitivity without resampling.
+
+# Conclusion
+
+Ridge logistic regression emerged as the best classifier (test accuracy 74.2%),
+reflecting the approximately linear separability of the risk factors and the
+limited sample. Age, family history, LDL, and tobacco are the primary
+predictors, consistent with established cardiovascular epidemiology. Future
+work could extend this pipeline with Bayesian uncertainty quantification
+[@ke2024accelerating] to yield clinically actionable risk intervals rather
+than point predictions, and could apply the imbalance-dimensionality
+framework of @zhu2018lrid more formally to assess whether targeted resampling
+improves minority-class recall on larger cohorts.
 
 ::: {.content-visible when-format="html"}
 

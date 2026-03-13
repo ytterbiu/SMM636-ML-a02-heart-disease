@@ -7,8 +7,9 @@ QMD       := quarto/index.qmd
 OUTDIR    := quarto/_output
 
 # -- Default: build all formats ---------------------------------
-all: 
+all:
 	quarto render $(QMD)
+	@$(MAKE) wordcount
 
 # -- Individual Quarto renders ----------------------------------
 html:
@@ -31,23 +32,26 @@ pdf:
 # Step 1: Quarto generates .tex
 # Step 2: latexmk compiles it IN the _output dir (avoids path bugs)
 pdf-manual:
-	@echo "--- Generating .tex via Quarto ---"
 	quarto render $(QMD) --to latex
-	@echo "--- Compiling PDF via latexmk (in _output dir) ---"
-	cd $(OUTDIR) && latexmk \
-	    -xelatex \
+	cd quarto/_output && TEXINPUTS=".:..:$$TEXINPUTS" latexmk \
 	    -synctex=1 \
 	    -interaction=nonstopmode \
 	    -file-line-error \
-	    report.tex
-	@echo "--- PDF built at $(OUTDIR)/report.pdf ---"
+	    -xelatex \
+	    -outdir=. \
+	    index.tex
 
-# -- Convert ipynb → .py ---------------------------------------
+# -- Convert ipynb -> .py ---------------------------------------
 py: $(SCRIPT)
 $(SCRIPT): $(NOTEBOOK)
 	jupyter nbconvert --to script --output $(basename $(SCRIPT)) $(NOTEBOOK)
 	@echo "✓ Generated $(SCRIPT) from $(NOTEBOOK)"
 
+wordcount:
+	@printf "Total:           " && pandoc quarto/_site/index.docx -t plain | wc -w
+	@printf "Excluding refs:  " && pandoc quarto/_site/index.docx -t plain | sed '/^References$$/,$$ d' | wc -w
+
+	
 # -- Clean ------------------------------------------------------
 clean:
 	rm -f $(SCRIPT)

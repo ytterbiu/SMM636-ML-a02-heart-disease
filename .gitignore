@@ -12,7 +12,8 @@ quarto/.quarto/
 quarto/*_files/
 quarto/site_libs/
 #! check below when pushing to github
-quarto/_freeze/ 
+quarto/_freeze/
+quarto/_site/
 
 # Python
 __pycache__/
