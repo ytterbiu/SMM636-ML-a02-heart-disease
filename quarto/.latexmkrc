@@ -1,0 +1,1 @@
+echo '$aux_dir = "_site"; $out_dir = "_site";' > quarto/.latexmkrc
