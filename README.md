@@ -12,14 +12,14 @@ TBI
 ```
 project/
 ├── data/
-│   └── heart-disease.csv          # data (462 obs, 10 vars)
+│   └── heart-disease.csv                   # data (462 obs, 10 vars)
 ├── quarto/
-│   ├── _quarto.yml                # project config
-│   ├── report.qmd                 # renders to PDF, HTML, Word
-│   ├── references.bib             # bibliography with URLs
-│   ├── ml-smm636-a02-heart-disease.py    # standalone py submission
-│   ├── ml-smm636-a02-heart-disease.ipynb # Jupyter notebook
-│   └── _output/                   # output files
+│   ├── _quarto.yml                         # project config
+│   ├── report.qmd                          # renders to PDF, HTML, Word
+│   ├── references.bib                      # bibliography with URLs
+│   ├── ml-smm636-a02-heart-disease.py      # standalone py submission
+│   ├── ml-smm636-a02-heart-disease.ipynb   # Jupyter notebook
+│   └── _output/                            # output files
 ├── .gitignore
 └── README.md
 ```
