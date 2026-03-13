@@ -91,6 +91,43 @@ It contains its own inline Python that executes during rendering.
 > [!IMPORTANT] Inline Python in `qmd` file is separate from the `ipynb`
 > notebook.
 
+### Git branching
+
+Two branches: `main` (clean public record) and `dev` (local scratchpad).
+
+**Daily work on `dev` — commit freely:**
+
+```bash
+git add -A
+git commit -m "work in progress notes, messy commits, etc."
+git push origin dev   # optional backup, no Actions triggered
+```
+
+**Every few days — squash-merge into `main`:**
+
+```bash
+git checkout main
+git merge --squash dev
+git commit -m "Meaningful summary of what changed e.g. EDA complete: heatmap, ROC figure"
+git push origin main  # triggers GitHub Actions, updates public site
+
+git checkout dev
+git rebase main       # re-anchors dev onto new main commit
+```
+
+`main` history reads as a clean narrative. The full granular history lives on
+`dev` locally. If `dev` goes sideways, recover from `main`:
+
+```bash
+git checkout main
+git branch -D dev
+git checkout -b dev
+```
+
+> [!NOTE] After a squash-merge, individual `dev` commits do not appear in
+> `main`'s public history — only the single squash commit does. The detailed
+> trail is preserved locally on `dev`.
+
 ## Dataset
 
 The Western Cape heart disease dataset contains 462 observations of adult males
