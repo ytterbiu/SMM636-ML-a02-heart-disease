@@ -7,6 +7,46 @@ Learning. -->
 
 TBI
 
+## Project structure
+
+```
+project/
+├── data/
+│   └── heart-disease.csv          # data (462 obs, 10 vars)
+├── quarto/
+│   ├── _quarto.yml                # project config
+│   ├── report.qmd                 # renders to PDF, HTML, Word
+│   ├── references.bib             # bibliography with URLs
+│   ├── ml-smm636-a02-heart-disease.py    # standalone py submission
+│   ├── ml-smm636-a02-heart-disease.ipynb # Jupyter notebook
+│   └── _output/                   # output files
+├── .gitignore
+└── README.md
+```
+
+## Rendering
+
+From the `quarto/` directory:
+
+```bash
+# All formats
+quarto render report.qmd
+
+# Single format
+quarto render report.qmd --to pdf
+quarto render report.qmd --to html
+quarto render report.qmd --to docx
+```
+
+PDF requires XeLaTeX and fonts described in `premable.tex`.
+
+## Converting .py to .ipynb
+
+```bash
+pip install jupytext
+jupytext --to notebook chd_analysis.py
+```
+
 ## Dataset
 
 TBI
@@ -25,6 +65,6 @@ Can also export `.py` file using
 .venv/bin/python -m pip install numpy
 ```
 
-## Requriresments
+## Requirements
 
 TBI
