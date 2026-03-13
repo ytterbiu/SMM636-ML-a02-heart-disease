@@ -57,7 +57,7 @@ format:
       - "ml-smm636-a02-heart-disease.ipynb"
     code-links:
       - text: Jupyter Notebook
-        href: ml-smm636-a02-heart-disease.ipynb
+        href: https://github.com/ytterbiu/SMM636-ML-a02-heart-disease/blob/main/ml-smm636-a02-heart-disease.ipynb
         icon: journal-code
   docx:
     toc: true
