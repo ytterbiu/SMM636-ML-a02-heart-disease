@@ -1,0 +1,88 @@
+name: Build and Deploy Quarto Site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # allows manual trigger from GitHub UI
+
+# Sets permissions for GITHUB_TOKEN to allow deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only allow one deployment at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # -- Checkout repo ----------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # -- Install Python + dependencies ------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python packages
+        run: |
+          pip install numpy pandas matplotlib seaborn scikit-learn jupyter
+
+      # -- Install Quarto ---------------------------------------
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      # -- Install system fonts ---------------------------------
+      # If using system-installed fonts (Roboto, Source Code Pro)
+      # For Libertinus from fonts/ dir, fontspec Path= handles it
+      - name: Install fonts
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y fonts-roboto fonts-liberation
+          # If Source Code Pro isn't available via apt:
+          # wget -q https://github.com/adobe-fonts/source-code-pro/releases/download/2.042R-u/1.062R-i/1.026R-vf/OTF-source-code-pro-2.042R-u_1.062R-i.zip
+          # unzip -q OTF-source-code-pro-*.zip -d /usr/local/share/fonts/
+          # fc-cache -f
+          fc-cache -f
+
+      # -- Install TeX Live for PDF -----------------------------
+      - name: Install TinyTeX
+        uses: r-lib/actions/setup-tinytex@v2
+
+      - name: Install LaTeX packages
+        run: |
+          tlmgr install \
+            amsmath booktabs graphicx multicol fontspec setspace babel \
+            fancyhdr tcolorbox varwidth xcolor etoolbox environ \
+            pgf tikz-cd caption subcaption float xurl bookmark \
+            microtype upquote footnotehyper longtable unicode-math \
+            lm lm-math koma-script epstopdf-pkg
+
+      # -- Render all formats -----------------------------------
+      - name: Render Quarto project
+        run: |
+          cd quarto && quarto render index.qmd
+
+      # -- Upload artifact for Pages ----------------------------
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: quarto/_output
+
+  # -- Deploy to GitHub Pages -----------------------------------
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
