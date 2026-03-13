@@ -50,10 +50,28 @@ np.random.seed(SEED)
 df = pd.read_csv("../data/heart-disease.csv")
 ```
 
-# First section
+# Exploratory data analysis {#sec-exploratory-data-analysis}
 
-Here is some text... @zhu2020adjusting
+The dataset comprises 462 adult males from Western
+Cape, South Africa, with no missing values across nine predictors and a binary
+target (`chd`). The distribution is 302 controls
+(65.4%) versus 160 CHD-positive cases (34.6%). 
 
-And some more
+We know from @zhu2020adjusting,
+the effective severity of class imbalance depends jointly on the ratio and the
+feature dimensionality. Here, with only $p = 9$ predictors, this imbalance is
+relatively minor therefore no required synthetic oversampling...
+
+
+::: {.content-visible when-format="html"}
+
+## Reproducibility
+
+The full analysis code is available as a Jupyter notebook
+([`ml-smm636-a02-heart-disease.ipynb`](../ml-smm636-a02-heart-disease.ipynb)) and as a derived Python script
+<!-- ([`ml-smm636-a02-heart-disease.py`](../ml-smm636-a02-heart-disease.py)). -->
+The dataset is at [`data/heart-disease.csv`](../data/heart-disease.csv).
+
+:::
 
 # References {.unnumbered}
