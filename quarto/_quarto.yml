@@ -54,7 +54,7 @@ format:
       - pdf
       - docx
     resources:
-      - "../ml-smm636-a02-heart-disease.ipynb"
+      - "ml-smm636-a02-heart-disease.ipynb"
     code-links:
       - text: Jupyter Notebook
         href: ml-smm636-a02-heart-disease.ipynb
