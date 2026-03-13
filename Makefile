@@ -8,9 +8,10 @@ SITEDIR  := quarto/_site
 
 # ── Default: build all formats ─────────────────────────────────
 all:
-	quarto render $(QMD) --to html
-	quarto render $(QMD) --to docx
-	@$(MAKE) pdf
+# 	quarto render $(QMD) --to html
+# 	quarto render $(QMD) --to docx
+# 	@$(MAKE) pdf
+	quarto render $(QMD)
 	@$(MAKE) wordcount
 
 # ── HTML & DOCX: Quarto handles these fine ─────────────────────
