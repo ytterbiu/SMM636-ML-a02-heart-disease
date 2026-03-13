@@ -1,9 +1,66 @@
 
 project:
-  type: default
+  type: website
   output-dir: _output
  
 # Project-level defaults (can be overridden per-document)
+
 execute:
   freeze: auto
- 
+
+website:
+  repo-url: "https://github.com/ytterbiu/SMM636-ML-a02-heart-disease"
+  repo-actions: [source]
+  navbar:
+    title: "SMM636 Machine Learning - Heart Disease Modelling Project"
+    right:
+      - icon: github
+        href: "https://github.com/ytterbiu/SMM636-ML-a02-heart-disease"
+
+# -- Shared format defaults ------------------------------------
+# Apply to ALL .qmd files in the project.
+# Per-document YAML overrides these where needed.
+format:
+  pdf:
+    documentclass: article
+    fontsize: 12pt
+    pdf-engine: xelatex
+    geometry:
+      - a4paper
+      - margin=1in
+    number-sections: false
+    colorlinks: false
+    link-citations: true
+    link-bibliography: true
+    fig-pos: "H"
+    keep-tex: true
+    include-in-header: preamble.tex
+  html:
+    theme:
+      light: flatly
+      dark: darkly
+    highlight-style: a11y
+    toc: true
+    toc-depth: 2
+    number-sections: false
+    code-fold: true
+    code-tools: true
+    html-math-method: mathjax
+    self-contained: true
+    fig-width: 7
+    fig-height: 4.5
+    format:
+    format-links:
+      - pdf
+      - docx
+    resources:
+      - "../ml-smm636-a02-heart-disease.ipynb"
+    code-links:
+      - text: Jupyter Notebook
+        href: ml-smm636-a02-heart-disease.ipynb
+        icon: journal-code
+  docx:
+    toc: true
+    number-sections: true
+    fig-width: 6
+    fig-height: 4

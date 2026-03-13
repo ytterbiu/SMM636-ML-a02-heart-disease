@@ -1,0 +1,57 @@
+---
+title: "Predictive Modelling of Coronary Heart Disease in Western Cape Males"
+subtitle: "SMM636 Individual Coursework 2025-26"
+author: 
+  - name: Benjamin Evans
+    orcid: 0000-0001-6611-4500
+    degrees:
+    - PhD
+    corresponding: true
+    affiliation: City St George's, University of London
+bibliography: references.bib
+csl: apa.csl
+categories:
+  - MSc
+  - SMM636
+  - 2025-26
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{python}
+#| label: setup
+#| include: false
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import (
+    train_test_split, GridSearchCV, StratifiedKFold
+)
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import (
+    accuracy_score, classification_report, confusion_matrix,
+    roc_auc_score, roc_curve, ConfusionMatrixDisplay
+)
+import warnings
+warnings.filterwarnings("ignore")
+
+SEED = 42
+np.random.seed(SEED)
+
+# Load data — CSV lives one level up in ../data/
+df = pd.read_csv("../data/heart-disease.csv")
+```
+
+# First section
+
+Here is some text... @zhu2020adjusting
+
+# References {.unnumbered}
