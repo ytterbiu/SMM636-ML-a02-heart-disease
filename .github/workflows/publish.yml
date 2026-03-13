@@ -52,22 +52,12 @@ jobs:
           fc-cache -f
 
       # -- Install TeX Live for PDF -----------------------------
-      - name: Install TinyTeX
-        uses: r-lib/actions/setup-tinytex@v2
-
-      - name: Install LaTeX packages
-        run: |
-          tlmgr install \
-            amsmath booktabs graphicx multicol fontspec setspace babel \
-            fancyhdr tcolorbox varwidth xcolor etoolbox environ \
-            pgf tikz-cd caption subcaption float xurl bookmark \
-            microtype upquote footnotehyper longtable unicode-math \
-            lm lm-math koma-script epstopdf-pkg
-
+      - name: Install Quarto TinyTeX
+        run: quarto install tinytex
+        
       # -- Render all formats -----------------------------------
       - name: Render Quarto project
-        run: |
-          cd quarto && quarto render index.qmd
+        run: quarto render quarto/index.qmd
 
       # -- Upload artifact for Pages ----------------------------
       - name: Upload Pages artifact
