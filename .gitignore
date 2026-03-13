@@ -10,6 +10,7 @@ fig/
 quarto/_output/
 quarto/.quarto/
 quarto/*_files/
+quarto/site_libs/
 #! check below when pushing to github
 quarto/_freeze/ 
 

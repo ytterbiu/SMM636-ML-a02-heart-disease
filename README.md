@@ -38,6 +38,13 @@ quarto render report.qmd --to html
 quarto render report.qmd --to docx
 ```
 
+```zsh
+make #(or make all): Builds the PDF, HTML, and Word docs.
+make pdf  #Builds only the PDF (fastest for checking your work).
+make py #Runs the Jupyter conversion script.
+make clean #Wipes the generated files.
+```
+
 PDF requires XeLaTeX and fonts described in `premable.tex`.
 
 ## Converting .py to .ipynb
