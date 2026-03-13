@@ -1,4 +1,4 @@
-# Heart Disease Prediction Shiny App
+# South African Heart Disease Prediction
 
 Term 2 individual project for Machine Learning (50% of coursework grade). 
 This was part of a project at Bayes Business School (Term 2 2025-26) for 
