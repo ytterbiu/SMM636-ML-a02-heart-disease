@@ -1,5 +1,7 @@
 # South African Heart Disease Prediction
 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 Term 2 individual project for Machine Learning (50% of coursework grade). This
 was part of a project at Bayes Business School (Term 2 2025-26) for module
 SMM636 Machine Learning.
