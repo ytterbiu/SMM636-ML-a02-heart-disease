@@ -37,7 +37,8 @@ pdf:
 # ── Convert ipynb → .py ───────────────────────────────────────
 py: $(SCRIPT)
 $(SCRIPT): $(NOTEBOOK)
-	jupyter nbconvert --to script --output $(basename $(SCRIPT)) $(NOTEBOOK)
+	jupyter nbconvert --to script --no-prompt --output $(basename $(SCRIPT)) $(NOTEBOOK)
+	sed -i '' '/^# $$/d' $(SCRIPT)
 	@printf "✓ Generated $(SCRIPT)\n"
 
 # ── Word count ─────────────────────────────────────────────────
