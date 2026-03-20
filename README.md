@@ -6,8 +6,8 @@ Term 2 individual project for Machine Learning (50% of coursework grade). This
 was part of a project at Bayes Business School (Term 2 2025-26) for module
 SMM636 Machine Learning.
 
-> [!IMPORTANT] HTML report:
-> https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
+> [!IMPORTANT]
+> HTML report: https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
 
 ## Project structure
 
@@ -77,7 +77,7 @@ cd quarto/_site && TEXINPUTS=".:..:$TEXINPUTS" latexmk \
 ## Workflow
 
 The Jupyter notebook (`ml-smm636-a02-heart-disease.ipynb`) is the source of the
-analysis code. It's easier to work with a notebook, but it's not accepted for
+analysis code. Easier to work with a notebook, but it's not accepted for
 the submission so a `.py` submission file is generated from it:
 
 ```zsh
@@ -87,11 +87,6 @@ jupyter nbconvert --to script ml-smm636-a02-heart-disease.ipynb
 ```
 
 The Quarto report (`quarto/index.qmd`) is the source for the written report.
-
-It contains its own inline Python that executes during rendering.
-
-> [!IMPORTANT] Inline Python in `qmd` file is separate from the `ipynb`
-> notebook.
 
 ### Git branching (personal notes)
 
@@ -126,7 +121,8 @@ git branch -D dev
 git checkout -b dev
 ```
 
-> [!NOTE] After a squash-merge, individual `dev` commits do not appear in
+> [!NOTE]
+> After a squash-merge, individual `dev` commits do not appear in
 > `main`'s public history — only the single squash commit does. The detailed
 > trail is preserved locally on `dev`.
 
