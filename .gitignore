@@ -14,6 +14,8 @@ quarto/site_libs/
 #! check below when pushing to github
 quarto/_freeze/
 quarto/_site/
+quarto/_freeze/
+quarto/_site/
 
 # Python
 __pycache__/
@@ -57,6 +59,14 @@ peer-assessment/*
 
 # cached files
 quarto/SMM636-a02-SubmissionForm.pdf
+2603*
+draft-v2.ipynb
+draft-v3.py
+draft-v2.py
+test_draft_v3.py
+draft-v2.py
+quarto/.gitignore
+
 2603*
 draft-v2.ipynb
 draft-v3.py
