@@ -1,7 +1,7 @@
 
 project:
   type: website
-  output-dir: _output
+  # output-dir: _output
  
 # Project-level defaults (can be overridden per-document)
 
@@ -24,7 +24,7 @@ format:
   pdf:
     documentclass: article
     fontsize: 12pt
-    pdf-engine: xelatex
+    pdf-engine: lualatex
     geometry:
       - a4paper
       - margin=1in
