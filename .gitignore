@@ -63,3 +63,5 @@ draft-v3.py
 draft-v2.py
 test_draft_v3.py
 draft-v2.py
+quarto/.gitignore
+
