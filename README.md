@@ -93,11 +93,11 @@ It contains its own inline Python that executes during rendering.
 > [!IMPORTANT] Inline Python in `qmd` file is separate from the `ipynb`
 > notebook.
 
-### Git branching
+### Git branching (personal notes)
 
-Two branches: `main` (clean public record) and `dev` (local scratchpad).
+Two branches: `main` (clean public record) and `dev` (local testing).
 
-**Daily work on `dev` — commit freely:**
+**Daily work on `dev`:**
 
 ```bash
 git add -A
@@ -105,7 +105,7 @@ git commit -m "work in progress notes, messy commits, etc."
 git push origin dev   # optional backup, no Actions triggered
 ```
 
-**Every few days — squash-merge into `main`:**
+**Squash-merge into `main`:**
 
 ```bash
 git checkout main
