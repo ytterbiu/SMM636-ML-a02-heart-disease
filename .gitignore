@@ -4,18 +4,16 @@
 submission-documents/
 _resources/
 # hidden fig for now - can remove later if change to qaurto/rmd
-fig/ 
+fig/
 
 # Quarto output
-quarto/_output/
-quarto/.quarto/
-quarto/*_files/
-quarto/site_libs/
+_output/
+.quarto/
+*_files/
+site_libs/
 #! check below when pushing to github
-quarto/_freeze/
-quarto/_site/
-quarto/_freeze/
-quarto/_site/
+_freeze/
+_site/
 
 # Python
 __pycache__/
@@ -68,6 +66,7 @@ draft-v2.py
 quarto/.gitignore
 
 2603*
+draft*
 draft-v2.ipynb
 draft-v3.py
 draft-v2.py
@@ -75,3 +74,6 @@ test_draft_v3.py
 draft-v2.py
 quarto/.gitignore
 
+ml-smm636-a02-private.ipynb
+
+/.quarto/

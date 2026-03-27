@@ -1,6 +1,9 @@
 
 project:
   type: website
+  render:
+    - index.qmd
+    - "!*.ipynb"
   # output-dir: _output
  
 # Project-level defaults (can be overridden per-document)
@@ -35,30 +38,31 @@ format:
     fig-pos: "H"
     keep-tex: true
     include-in-header: preamble.tex
-  html:
-    theme:
-      light: flatly
-      dark: darkly
-    highlight-style: a11y
-    toc: true
-    toc-depth: 2
-    number-sections: false
-    code-fold: true
-    code-tools: true
-    html-math-method: mathjax
-    self-contained: true
-    fig-width: 7
-    fig-height: 4.5
-    format:
-    format-links:
-      - pdf
-      - docx
-    resources:
-      - "ml-smm636-a02-heart-disease.ipynb"
-    code-links:
-      - text: Jupyter Notebook
-        href: https://github.com/ytterbiu/SMM636-ML-a02-heart-disease/blob/main/ml-smm636-a02-heart-disease.ipynb
-        icon: journal-code
+  # html:
+  #   theme:
+  #     light: flatly
+  #     dark: darkly
+  #   respect-user-color-scheme: true
+  #   highlight-style: a11y
+  #   toc: true
+  #   toc-depth: 2
+  #   number-sections: false
+  #   code-fold: true
+  #   code-tools: true
+  #   html-math-method: mathjax
+  #   self-contained: true
+  #   fig-width: 7
+  #   fig-height: 4.5
+  #   format:
+  #   format-links:
+  #     - pdf
+  #     # - docx
+  #   resources:
+  #     - "ml-smm636-a02-heart-disease.ipynb"
+  #   code-links:
+  #     - text: Jupyter Notebook
+  #       href: https://github.com/ytterbiu/SMM636-ML-a02-heart-disease/blob/main/ml-smm636-a02-heart-disease.ipynb
+  #       icon: journal-code
   docx:
     toc: true
     number-sections: true
