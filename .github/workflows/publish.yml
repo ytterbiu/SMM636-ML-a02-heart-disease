@@ -39,6 +39,11 @@ jobs:
         with:
           r-version: '4.4.0'
 
+      - name: Install system dependencies for R packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libxml2-dev libcurl4-openssl-dev libssl-dev
+
       - name: Install R packages
         run: |
           Rscript -e 'install.packages(c("knitr", "rmarkdown", "kableExtra", "tibble"), repos = "https://cloud.r-project.org")'
