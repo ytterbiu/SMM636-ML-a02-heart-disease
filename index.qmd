@@ -44,8 +44,7 @@ format_var_name <- function(x) {
 
 ::: {.content-visible when-format="html"}
 ::: {.callout-important}
-This report was produced and complies with a maximum word count of 1000. Please 
-see the `ipynb` notebook for a more detailed description of this analysis.
+This report is subject to a 1000 word limit. The accompanying Jupyter notebook contains the full analysis with extended commentary and additional figures.
 :::
 :::
 

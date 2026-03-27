@@ -12,27 +12,21 @@ SMM636 Machine Learning.
 ## Project structure
 
 ```
-project/
-├── ml-smm636-a02-heart-disease.ipynb  # main ipynb
-├── ml-smm636-a02-heart-disease.py     # created from ipynb for submission
+├── ml-smm636-a02-heart-disease.ipynb   # analysis notebook (source of truth)
+├── ml-smm636-a02-heart-disease.py      # derived .py for submission
+├── index.qmd                           # Quarto report
+├── preamble.tex                        # LaTeX preamble
+├── references.bib                      # bibliography
+├── _quarto.yml                         # Quarto project config
 ├── Makefile
 ├── data/
-│   └── heart-disease.csv              # dataset (462 obs, 10 vars)
-├── quarto/
-│   ├── _quarto.yml                    # config (website type)
-│   ├── index.qmd                      # report base file
-│   ├── preamble.tex
-│   ├── references.bib
-│   └── _site/                         # rendered output
-│       ├── index.html
-│       ├── index.pdf
-│       └── index.docx
-├── .github/
-│   └── workflows/
-│       └── publish.yml                # GitHub actions
-├── .gitignore
+│   └── heart-disease.csv               # dataset (462 obs, 10 vars)
+├── fig/                                # pre-generated figures from notebook
+├── _site/                              # rendered output (HTML, PDF)
+├── .github/workflows/publish.yml       # GitHub Pages deployment
 └── README.md
 ```
+
 
 ## Rendering
 
