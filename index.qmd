@@ -51,14 +51,14 @@ This report is subject to a 1000 word limit. The accompanying Jupyter notebook c
 # Introduction {#sec-introduction}
 
 Coronary, or ischaemic, heart disease (CHD) was responsible for 9.0 million
-deaths in 2021, representing 13% of the global total and an increase of 2.7
+deaths in 2021, representing 13% of global total deaths and an increase of 2.7
 million since 2000 [@who2024topcauses]. Machine learning models offer a data
 driven approach to identifying at risk individuals and enabling targeted
 intervention through lifestyle modification, pharmacological treatment, and
 population level screening [@wu-deep-2025].
 
 This report analyses a subset of adult white males from the Coronary Risk
-Factor Study [CORIS; @rossouw1983], a baseline survey of three rural communities
+Factor Study [CORIS; @rossouw1983]; a baseline survey of three rural communities
 in the Western Cape, South Africa. This subset has since become a standard
 classification benchmark [@hastie2009elements].
 
@@ -126,7 +126,7 @@ heart_vars %>%
 <!-- Note that the original Rossouw et al. (1983) paper doesn't specify units for ldl -->
 <!-- and alcohol and the dataset documentation is silent on both. -->
 
-![(Left) Feature distributions stratified by CHD status, age, tobacco, and ldl show the clearest separation. (Right) Pearson correlation matrix. The adiposity/obesity pair ($r = 0.72$) motivates L2 regularisation.](fig/fig_eda_combined.png){#fig-correlation-combined width=95% fig-pos="ht!"}
+![(Left) Probability density histograms of features stratified by CHD status; age, tobacco, and ldl show the clearest separation. (Right) Pearson correlation matrix. The adiposity/obesity pair ($r = 0.72$) motivates L2 regularisation.](fig/fig_eda_combined.png){#fig-correlation-combined width=100% fig-pos="ht!"}
 
 
 # Ridge logistic regression {#sec-ridge}
@@ -140,11 +140,11 @@ validated this redundancy: `r format_var_name("adiposity")`,
 `r format_var_name("obesity")`, and `r format_var_name("alcohol")` were driven 
 to exactly zero with no loss of accuracy, confirming their information is 
 already captured by the remaining predictors.
-The regularisation strength $C$ was tuned via 10-fold stratified cross
-validation over 20 logarithmically spaced candidates in $[10^{-4}, 10^{4}]$.
-The optimal $C = 0.616$ yields CV accuracy of 74.3% and test accuracy of
-74.2%, with AUC = 0.818. The near zero CV/test gap (0.001) indicates strong
-generalisation.
+The regularisation strength $C$ was tuned via 10-fold stratified 
+cross-validation (CV) over 20 logarithmically spaced candidates in $[10^{-4}, 10^{4}]$.
+The optimal $C = 0.616$ yields a CV accuracy of 74.3% and test accuracy of
+74.2%, with an Area Under the Receiver Operating Characteristic Curve (AUC) of
+0.818. The near zero CV--test gap (0.001) indicates strong generalisation.
 
 @fig-coefficients displays the standardised coefficients. Because inputs are 
 standardised, coefficients are directly comparable.
@@ -157,21 +157,22 @@ and `r format_var_name("tobacco")` (0.31). `r format_var_name("obesity")` and
 body composition is irrelevant, but because the ridge penalty distributes
 their shared variance given high collinearity ($r = 0.72$). SHAP analysis
 aligns with this ranking, providing two independent methodologies that yield
-the exact same feature importance structure.
+the same feature importance structure.
 
-![Ridge LR feature importance. (a) Standardised coefficients showing direction and magnitude of each feature's linear contribution to CHD risk: positive values (red) increase predicted risk, negative values (blue) decrease it. (b) Mean absolute SHAP values confirming the same importance ranking via an independent method. (c) SHAP beeswarm plot showing how individual feature values (colour) drive predictions. Age, family history, LDL, and tobacco dominate across all three views.](fig/fig_ridge_coef_shap_bee.png){#fig-coefficients width=100% fig-pos="ht!"}
+![Ridge LR feature importance. (a) Standardised coefficients showing the direction and magnitude of each feature's linear contribution to CHD risk. Positive values (red) increase predicted risk. The small negative values (blue) for adiposity and obesity reflect multivariate adjustments holding highly collinear factors (like LDL) constant, rather than a true protective effect. (b) Mean absolute SHAP values confirming the same importance ranking via an independent method. (c) SHAP beeswarm plot showing how individual feature values (colour) drive predictions. Age, family history, LDL, and tobacco dominate across all three views.](fig/fig_ridge_coef_shap_bee.png){#fig-coefficients width=100% fig-pos="ht!"}
+
 
 # Alternative classifiers {#sec-alternatives}
 
 ```{r}
 #| label: tbl-comparison
-#| tbl-cap: "Rationale and performance metrics for all classifiers tuned via 10-fold stratified CV on identical splits, including cross-validation accuracy,  test accuracy, AUC, F1 score for the positive class, and difference between CV and test accuracy."
+#| tbl-cap: "Rationale and performance metrics for all classifiers tuned via 10-fold stratified CV on identical splits, including CV accuracy,  test accuracy, AUC, F1 score for the positive class, and difference between CV and test accuracy."
 
 library(tibble)
 library(kableExtra)
 
 model_comp <- tribble(
-  ~Model,                    ~Rationale,                                         ~`CV Acc.`, ~`Test Acc.`, ~AUC,   ~`F1 (CHD)`, ~`CV - Test`,
+  ~Model,                    ~Rationale,                                         ~`CV Acc.`, ~`Test Acc.`, ~AUC,   ~`F1 (CHD)`, ~`CV $-$ Test`,
   "Ridge LR",                "Interpretable linear baseline; handles collinearity", 0.743,   0.742,        0.818,  0.625,        "+0.001",
   "Ridge LR (FA)",           "Tests if dimension reduction aids classification",    0.688,   0.763,        0.809,  0.621,        "-0.075",
   "Gradient Boosting",       "Sequential residual correction; alternative nonlinear", 0.697, 0.763,       0.793,  0.645,        "-0.067",
@@ -204,7 +205,7 @@ model_comp %>%
 @tbl-comparison summarises the classifiers evaluated alongside Ridge LR, each
 testing a specific hypothesis about the data structure. Ridge LR achieves the
 highest AUC (0.818) and the smallest CV--test gap (+0.001), indicating that
-cross-validation performance closely matches held-out performance. A Support
+CV performance closely matches held-out performance. A Support
 Vector Machine (SVM) attains the highest CV accuracy (74.8%) but drops to 72.0%
 on the test set, a pattern indicative of overfitting on small samples
 [@asimit2022robust]. Random Forest's optimal depth of 3 confirms that the
@@ -216,10 +217,10 @@ the highest test accuracy (76.3%) but the lowest CV accuracy (69.7%), producing
 a negative gap that suggests sampling variance on 93 test patients rather than
 genuinely superior learning.
 
-Nested CV (5 outer $\times$ 10 inner folds) yields $73.2\% \pm 4.3\%$ for Ridge
-LR, confirming no optimistic bias. McNemar's test comparing Ridge LR against
-each alternative yields $p$ values from 0.146 (KNN) to 1.000 (XGBoost), with no
-model reaching significance. 
+Nested CV (5 outer $\times$ 10 inner folds) yields $73.2\% \pm 4.3\%$ (mean
+$\pm$ SD) for Ridge LR, confirming no optimistic bias. McNemar's test comparing
+Ridge LR against each alternative yields $p$ values from 0.146 (KNN) to 1.000
+(XGBoost), with no model reaching significance.
 <!-- As established in @sec-eda, synthetic oversampling was not required. -->
 
 # Discussion and conclusion {#sec-discussion}
@@ -233,26 +234,27 @@ both PCA and MDS confirm that CHD positive and negative patients occupy heavily
 overlapping regions of the feature space (Appendix, @fig-apd-pca-biplot; @fig-apd-mds).
 
 Type A behaviour (`r format_var_name("typea")`) emerges as the fourth strongest
-predictor in the ridge coefficients. A SHAP heatmap (@fig-apd-shap-heatmap)
-reveals that it operates independently of the other major risk factors, with
-contributions scattered across the risk spectrum rather than following the
-smooth gradient observed for `r format_var_name("age")` and 
+predictor in the ridge coefficients. A SHAP heatmap (Appendix,
+@fig-apd-shap-heatmap) reveals that it operates independently of the other major
+risk factors, with contributions scattered across the risk spectrum rather than
+following the smooth gradient observed for `r format_var_name("age")` and
 `r format_var_name("famhist")`. This suggests psychological stress acts through 
 a distinct pathway, orthogonal to the metabolic and lifestyle factors identified
 by factor analysis.
 
 The preferred classifier depends on the clinical context. For population
-screening, where maximising sensitivity at an acceptable false-positive rate is
-the priority, Ridge LR's superior AUC makes it the strongest candidate. For
-diagnostic confirmation, Gradient Boosting offers higher precision for the CHD
-class (0.67 vs 0.62). For deployment requiring consistent performance on new
-patients, Ridge LR's near-zero CV--test gap and interpretable coefficients
-make it the most reliable choice. The dominant risk factors identified here
-(`r format_var_name("age")`, `r format_var_name("famhist")`, 
-`r format_var_name("ldl")`, `r format_var_name("tobacco")`) are consistent with 
-established cardiovascular epidemiology across both European
-[@townsend-epidemiology-2022] and American [@joseph-cardiovascular-2025]
-populations, suggesting the findings generalise beyond this specific cohort.
+screening, where maximising sensitivity at an acceptable false-positive rate (1
+− specificity) is the priority [@evans25], Ridge LR's superior AUC makes it the
+strongest candidate. For diagnostic confirmation, Gradient Boosting offers
+higher precision for the CHD class (0.67 vs 0.62). For deployment requiring
+consistent performance on new patients, Ridge LR's near-zero CV--test gap and
+interpretable coefficients make it the most reliable choice. The dominant risk
+factors identified here (`r format_var_name("age")`, 
+`r format_var_name("famhist")`, `r format_var_name("ldl")`, 
+`r format_var_name("tobacco")`) are consistent with established cardiovascular
+epidemiology across both European [@townsend-epidemiology-2022] and American
+[@joseph-cardiovascular-2025] populations, suggesting the findings generalise
+beyond this specific cohort.
 
 One limitation is that the dataset's 35% CHD prevalence reflects case--control
 sampling, whereas actual population prevalence was approximately 5%
@@ -276,10 +278,13 @@ single analytical approach.
 
 # Appendix {.unnumbered}
 
-## Supplementary Methodology {#sec-appendix .unnumbered}
+## Supplementary methodology {#sec-appendix .unnumbered}
 
-The following figures supplement the main analysis. All results can be
-reproduced by running the accompanying Jupyter notebook.
+The following figures supplement the main analysis. The full analysis, both the
+code used and a description of each step, is available as a Jupyter notebook
+([`ml-smm636-a02-heart-disease.ipynb`](../ml-smm636-a02-heart-disease.ipynb))
+and the dataset at [`data/heart-disease.csv`](../data/heart-disease.csv). All
+results can be reproduced by running the accompanying Jupyter notebook.
 
 ```{r}
 #| label: fig-apd-learning-curve
@@ -317,29 +322,43 @@ overlapping regions of the feature space. @fig-apd-shap-heatmap provides
 patient level explanations and shows that `r format_var_name("typea")`
 operates independently of the dominant metabolic and lifestyle risk factors.
 
-```{r eval=TRUE}
-#| label: fig-apd-notebook
-#| fig-cap: "Partial view of the Jupyter notebook containing the full analysis pipeline. The notebook includes all model fitting, hyperparameter tuning, and figure generation code with inline commentary."
-#| out-width: "90%"
-knitr::include_graphics("fig/fig_notebook_screenshot.png")
-```
-
 
 ## Reproducibility, accessibility, and word count {.unnumbered}
 
-The full analysis code is available as a Jupyter notebook
-([`ml-smm636-a02-heart-disease.ipynb`](../ml-smm636-a02-heart-disease.ipynb))
-and the dataset at
-[`data/heart-disease.csv`](../data/heart-disease.csv).
-The Python implementation is hosted in a public GitHub repository.
-All figures not shown in this appendix can be reproduced from this notebook.
+This report was authored using Quarto to ensure a fully reproducible and
+transparent workflow. The complete analysis, including the Python
+implementation, the Quarto source code, and the dataset
+[`data/heart-disease.csv`](../data/heart-disease.csv), is open-source and hosted
+in a public GitHub repository at:
 
-```{r, eval=FALSE}
+- https://github.com/ytterbiu/SMM636-ML-a02-heart-disease
+
+In addition to this document, an accessible, interactive HTML version of this
+report is available via GitHub Pages at:
+
+- https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
+
+The full modeling pipeline, including code and step-by-step commentary, is
+documented in the accompanying Jupyter notebook
+[`ml-smm636-a02-heart-disease.ipynb`](../ml-smm636-a02-heart-disease.ipynb). All
+figures or supplemental analyses not explicitly shown in this appendix can be
+entirely reproduced by executing this notebook.
+
+```{r, eval=TRUE}
 #| label: fig-apd-quarto-site
-#| fig-cap: "The report hosted as an interactive Quarto website with annotated key features including...."
+#| fig-cap: "A screenshot of an accessible HTML copy of this report hosted as an interactive Quarto website. Annotations highlight key accessibility and reproducibility features: (1) navigation tools, including a dark mode toggle and search; (2) quick links to the Quarto source code and a downloadable PDF automatically rendered via GitHub Actions; (3) direct access to the full Jupyter notebook via the public GitHub page; and (4) author information, affiliation, and ORCID iD."
 #| out-width: "90%"
-knitr::include_graphics("fig/fig_quarto_site_screenshot.png")
+knitr::include_graphics("fig/github_quarto_report_screenshot.png")
 ```
+
+
+```{r eval=TRUE}
+#| label: fig-apd-notebook
+#| fig-cap: "Partial view of the Jupyter notebook displayed via GitHub's native online preview. The notebook contains the complete analysis pipeline, including all data preprocessing, model fitting, hyperparameter tuning, and figure generation code alongside inline commentary."
+#| out-width: "90%"
+knitr::include_graphics("fig/github_notebook_screenshot.png")
+```
+
 
 ### Word count {.unnumbered}
 
@@ -353,25 +372,26 @@ The report Quarto file was used to produce a `.tex` file and the tool
 $ texcount index.tex
 
 File: index.tex
-Encoding: ascii
-Words in headers: 39
-Words outside text (captions, etc.): 265
-Number of headers: 14
-Number of floats/tables/figures: 9
-Number of math inlines: 13
+Encoding: utf8
+Words in headers: 32
+Words outside text (captions, etc.): 315
+Number of headers: 10
+Number of floats/tables/figures: 10
+Number of math inlines: 15
 Number of math displayed: 0
 Subcounts:
   text+headers+captions (#headers/#floats/#inlines/#displayed)
-  4+10+0 (1/0/0/0) _top_
   100+1+0 (1/0/0/0) Section: Introduction}\label{sec-introduction
-  179+3+37 (1/2/3/0) Section: Exploratory data analysis}\label{sec-eda
-  190+3+67 (1/1/7/0) Section: Ridge logistic regression}\label{sec-ridge
-  177+2+34 (1/1/3/0) Section: Alternative classifiers}\label{sec-alternatives
-  345+3+27 (1/1/0/0) Section: Discussion and conclusion}\label{sec-discussion
+  179+3+40 (1/2/3/0) Section: Exploratory data analysis}\label{sec-eda
+  200+3+88 (1/1/7/0) Section: Ridge logistic regression}\label{sec-ridge
+  179+2+34 (1/1/4/0) Section: Alternative classifiers}\label{sec-alternatives
+  350+3+27 (1/1/0/0) Section: Discussion and conclusion}\label{sec-discussion
 ...
 ```
 
-The total word count is `r 100+179+190+177+345`.
+::: {.callout-important}
+The total word count is `r 100+179+200+179+350`.
+:::
 
 ### Generative AI declaration {.unnumbered}
 
