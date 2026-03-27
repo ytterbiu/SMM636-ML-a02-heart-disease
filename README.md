@@ -6,8 +6,8 @@ Term 2 individual project for Machine Learning (50% of coursework grade). This
 was part of a project at Bayes Business School (Term 2 2025-26) for module
 SMM636 Machine Learning.
 
-> [!IMPORTANT] HTML report:
-> https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
+> [!IMPORTANT]
+> HTML report: https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
 
 ## Project structure
 
