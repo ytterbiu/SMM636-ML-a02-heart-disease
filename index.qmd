@@ -317,7 +317,7 @@ overlapping regions of the feature space. @fig-apd-shap-heatmap provides
 patient level explanations and shows that `r format_var_name("typea")`
 operates independently of the dominant metabolic and lifestyle risk factors.
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 #| label: fig-apd-notebook
 #| fig-cap: "Partial view of the Jupyter notebook containing the full analysis pipeline. The notebook includes all model fitting, hyperparameter tuning, and figure generation code with inline commentary."
 #| out-width: "90%"
