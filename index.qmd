@@ -53,7 +53,7 @@ This report is subject to a 1000 word limit. The accompanying Jupyter notebook c
 Coronary, or ischaemic, heart disease (CHD) was responsible for 9.0 million
 deaths in 2021, representing 13% of global total deaths and an increase of 2.7
 million since 2000 [@who2024topcauses]. Machine learning models offer a data
-driven approach to identifying at risk individuals and enabling targeted
+driven approach to identify at risk individuals and enable targeted
 intervention through lifestyle modification, pharmacological treatment, and
 population level screening [@wu-deep-2025].
 
@@ -68,7 +68,7 @@ The dataset contains 462 observations across nine clinical and behavioural
 predictors with no missing values (@tbl-variables). The class distribution
 exhibits a mild imbalance: 302 healthy controls (65.4%) versus 160 CHD-positive
 cases (34.6%), yielding a baseline majority-class accuracy of 65.4% and an
-Imbalance Ratio (IR) of 1.89. Because the effective severity of class imbalance
+imbalance ratio of 1.89. Because the effective severity of class imbalance
 is mitigated by higher feature dimensionality [@zhu2020adjusting], this low
 baseline IR combined with the rich feature space makes synthetic oversampling
 unnecessary.
@@ -79,7 +79,7 @@ Individuals with CHD tend to be older with higher
 The correlation matrix reveals
 substantial collinearity between `r format_var_name("adiposity")` and
 `r format_var_name("obesity")` ($r = 0.72$), motivating regularisation in subsequent
-modelling. Factor analysis identified a latent metabolic/ageing factor (loading on
+modelling. Factor analysis identifies a latent metabolic/ageing factor (loading on
 `r format_var_name("adiposity")`, `r format_var_name("age")`,
 `r format_var_name("obesity")`, and `r format_var_name("ldl")`) alongside an
 independent lifestyle factor (`r format_var_name("tobacco")`,
@@ -135,15 +135,15 @@ Logistic regression estimates CHD probability from a weighted combination of
 patient features. An L2 (ridge) penalty was applied to address the
 adiposity/obesity collinearity by constraining coefficient magnitudes and
 distributing predictive weight across correlated features. 
-An elastic net comparison ($l_1$-ratio = 0.5)
-validated this redundancy: `r format_var_name("adiposity")`, 
+An elastic net ($l_1$-ratio = 0.5)
+confirms this: `r format_var_name("adiposity")`, 
 `r format_var_name("obesity")`, and `r format_var_name("alcohol")` were driven 
 to exactly zero with no loss of accuracy, confirming their information is 
 already captured by the remaining predictors.
 The regularisation strength $C$ was tuned via 10-fold stratified 
 cross-validation (CV) over 20 logarithmically spaced candidates in $[10^{-4}, 10^{4}]$.
 The optimal $C = 0.616$ yields a CV accuracy of 74.3% and test accuracy of
-74.2%, with an Area Under the Receiver Operating Characteristic Curve (AUC) of
+74.2%, with an area under the receiver operating characteristic curve (AUC) of
 0.818. The near zero CV--test gap (0.001) indicates strong generalisation.
 
 @fig-coefficients displays the standardised coefficients. Because inputs are 
@@ -159,7 +159,7 @@ their shared variance given high collinearity ($r = 0.72$). SHAP analysis
 aligns with this ranking, providing two independent methodologies that yield
 the same feature importance structure.
 
-![Ridge LR feature importance. (a) Standardised coefficients showing the direction and magnitude of each feature's linear contribution to CHD risk. Positive values (red) increase predicted risk. The small negative values (blue) for adiposity and obesity reflect multivariate adjustments holding highly collinear factors (like LDL) constant, rather than a true protective effect. (b) Mean absolute SHAP values confirming the same importance ranking via an independent method. (c) SHAP beeswarm plot showing how individual feature values (colour) drive predictions. Age, family history, LDL, and tobacco dominate across all three views.](fig/fig_ridge_coef_shap_bee.png){#fig-coefficients width=100% fig-pos="ht!"}
+![Ridge LR feature importance. (a) Standardised coefficients showing the direction and magnitude of each feature's linear contribution to CHD risk. Positive values (red) increase predicted risk. The small negative values (blue) for adiposity and obesity reflect multivariate adjustments holding highly collinear factors (like age) constant, rather than a true protective effect. (b) Mean absolute SHAP values confirming the same importance ranking via an independent method. (c) SHAP beeswarm plot showing how individual feature values (colour) drive predictions. Age, family history, LDL, and tobacco dominate across all three views.](fig/fig_ridge_coef_shap_bee.png){#fig-coefficients width=100% fig-pos="ht!"}
 
 
 # Alternative classifiers {#sec-alternatives}
@@ -204,18 +204,17 @@ model_comp %>%
 
 @tbl-comparison summarises the classifiers evaluated alongside Ridge LR, each
 testing a specific hypothesis about the data structure. Ridge LR achieves the
-highest AUC (0.818) and the smallest CV--test gap (+0.001), indicating that
-CV performance closely matches held-out performance. A Support
-Vector Machine (SVM) attains the highest CV accuracy (74.8%) but drops to 72.0%
-on the test set, a pattern indicative of overfitting on small samples
-[@asimit2022robust]. Random Forest's optimal depth of 3 confirms that the
-underlying signal is low complexity, further supporting the linear model.
-K-Nearest Neighbours (KNN) performs worst, a known limitation of distance-based
-methods degrading when class-conditional distributions overlap in moderate
-dimensions [@zhu2017orthogonal; @zhu2019separating]. Gradient Boosting achieves
-the highest test accuracy (76.3%) but the lowest CV accuracy (69.7%), producing
-a negative gap that suggests sampling variance on 93 test patients rather than
-genuinely superior learning.
+highest AUC (0.818) and the smallest CV--test gap (+0.001), indicating that CV
+performance closely matches held-out performance. A Support Vector Machine (SVM)
+attains the highest CV accuracy (74.8%) but drops to 72.0% on the test set,
+consistent with overfitting on small samples [@asimit2022robust]. Random
+Forest's optimal depth of 3 confirms that the underlying signal is low
+complexity, further supporting the linear model. K-Nearest Neighbours (KNN)
+performs worst, as expected when class-conditional distributions overlap in
+moderate dimensions [@zhu2017orthogonal; @zhu2020separating]. Gradient Boosting
+achieves the highest test accuracy (76.3%) but the lowest CV accuracy (69.7%),
+producing a negative gap that suggests sampling variance on 93 test patients
+rather than genuinely superior learning.
 
 Nested CV (5 outer $\times$ 10 inner folds) yields $73.2\% \pm 4.3\%$ (mean
 $\pm$ SD) for Ridge LR, confirming no optimistic bias. McNemar's test comparing
@@ -243,8 +242,8 @@ a distinct pathway, orthogonal to the metabolic and lifestyle factors identified
 by factor analysis.
 
 The preferred classifier depends on the clinical context. For population
-screening, where maximising sensitivity at an acceptable false-positive rate (1
-− specificity) is the priority [@evans25], Ridge LR's superior AUC makes it the
+screening, where maximising sensitivity at an acceptable false-positive rate 
+(1-specificity) is the priority [@evans25], Ridge LR's superior AUC makes it the
 strongest candidate. For diagnostic confirmation, Gradient Boosting offers
 higher precision for the CHD class (0.67 vs 0.62). For deployment requiring
 consistent performance on new patients, Ridge LR's near-zero CV--test gap and
@@ -265,9 +264,9 @@ actionable risk intervals and apply the imbalance-dimensionality framework
 [@zhu2018lrid] to larger cohorts to assess whether targeted resampling improves
 minority-class recall.
 
-Ridge logistic regression is the recommended classifier for this cohort (test
+Ridge logistic regression is recommended for this cohort (test
 accuracy 74.2%, AUC 0.818). Age, family history, LDL cholesterol, and tobacco
-consistently emerge as the dominant risk factors across ridge coefficients,
+consistently emerge as dominant risk factors across ridge coefficients,
 permutation importance, SHAP values, and random forest importances,
 demonstrating that these findings are robust rather than artefacts of any
 single analytical approach.
@@ -325,24 +324,24 @@ operates independently of the dominant metabolic and lifestyle risk factors.
 
 ## Reproducibility, accessibility, and word count {.unnumbered}
 
-This report was authored using Quarto to ensure a fully reproducible and
-transparent workflow. The complete analysis, including the Python
-implementation, the Quarto source code, and the dataset
-[`data/heart-disease.csv`](../data/heart-disease.csv), is open-source and hosted
-in a public GitHub repository at:
+This report was created using Quarto. The complete analysis, including the
+Python implementation, the Quarto source code, and the dataset
+[`data/heart-disease.csv`](../data/heart-disease.csv), is available via a public
+GitHub repository:
 
-- https://github.com/ytterbiu/SMM636-ML-a02-heart-disease
+- Directory: <https://github.com/ytterbiu/SMM636-ML-a02-heart-disease>
+- Juypter notebook: <https://github.com/ytterbiu/SMM636-ML-a02-heart-disease/blob/main/ml-smm636-a02-heart-disease.ipynb>
 
 In addition to this document, an accessible, interactive HTML version of this
-report is available via GitHub Pages at:
+report is available via GitHub Pages:
 
-- https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
+- <https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/>
 
-The full modeling pipeline, including code and step-by-step commentary, is
+The full modelling pipeline, including code and step-by-step commentary, is
 documented in the accompanying Jupyter notebook
 [`ml-smm636-a02-heart-disease.ipynb`](../ml-smm636-a02-heart-disease.ipynb). All
 figures or supplemental analyses not explicitly shown in this appendix can be
-entirely reproduced by executing this notebook.
+reproduced using this notebook.
 
 ```{r, eval=TRUE}
 #| label: fig-apd-quarto-site
@@ -362,7 +361,7 @@ knitr::include_graphics("fig/github_notebook_screenshot.png")
 
 ### Word count {.unnumbered}
 
-The report Quarto file was used to produce a `.tex` file and the tool
+The report Quarto (`.qmd`) file was used to produce a `.tex` file and the tool
 `texcount` was used to count the words within each section. The output of
 `texcount` is shown below:
 
@@ -374,31 +373,31 @@ $ texcount index.tex
 File: index.tex
 Encoding: utf8
 Words in headers: 32
-Words outside text (captions, etc.): 315
+Words outside text (captions, etc.): 394
 Number of headers: 10
-Number of floats/tables/figures: 10
+Number of floats/tables/figures: 11
 Number of math inlines: 15
 Number of math displayed: 0
 Subcounts:
   text+headers+captions (#headers/#floats/#inlines/#displayed)
   100+1+0 (1/0/0/0) Section: Introduction}\label{sec-introduction
-  179+3+40 (1/2/3/0) Section: Exploratory data analysis}\label{sec-eda
-  200+3+88 (1/1/7/0) Section: Ridge logistic regression}\label{sec-ridge
-  179+2+34 (1/1/4/0) Section: Alternative classifiers}\label{sec-alternatives
-  350+3+27 (1/1/0/0) Section: Discussion and conclusion}\label{sec-discussion
+  178+3+40 (1/2/3/0) Section: Exploratory data analysis}\label{sec-eda
+  197+3+88 (1/1/7/0) Section: Ridge logistic regression}\label{sec-ridge
+  172+2+34 (1/1/4/0) Section: Alternative classifiers}\label{sec-alternatives
+  346+3+27 (1/1/0/0) Section: Discussion and conclusion}\label{sec-discussion
 ...
 ```
 
 ::: {.callout-important}
-The total word count is `r 100+179+200+179+350`.
+The total word count is `r 100+178+197+172+346`.
 :::
 
 ### Generative AI declaration {.unnumbered}
 
-Generative AI (GenAI) tools were used during the development of this
+Generative AI (GenAI) tools were used throughout this
 coursework to assist with coding syntax, typesetting debugging, and
 structural brainstorming. In practice, these tools functioned as an
-interactive technical reference and advanced grammar checker. All
+interactive technical reference and advanced syntax checker. All
 project decisions remained entirely the author's own.
 
 **Tools used:** Claude Opus 4.6 (Anthropic) and Gemini 3 Pro (Google).
@@ -406,22 +405,22 @@ project decisions remained entirely the author's own.
 **Representative prompts:** The following illustrate the types of queries
 submitted rather than an exhaustive list:
 
-- "What is the syntax for combining a scaler and a classifier withscikit-learn?"
+- "What is the syntax for combining a scaler and a classifier with `scikit-learn`?"
 - "why is this Quarto cross-reference to a figure failing 
   to render correctly in the PDF output?"
 - "how to force a specific aspect ratio and align a SHAP
   beeswarm plot next to a bar chart in `matplotlib`?"
 
-**Nature of GenAI outputs:**
+<!-- **Nature of GenAI outputs:** -->
 
-- Provided boilerplate Python syntax for data pipelines and complex
-  multi-panel visualisations.
-- Helped identify and resolve specific LaTeX and Quarto rendering errors.
+<!-- - Provided boilerplate Python syntax for data pipelines and complex -->
+<!--   multi-panel visualisations. -->
+<!-- - Helped identify and resolve specific LaTeX and Quarto rendering errors. -->
 
 **Author declarations:**
 
 - *Originality of text:* No AI-generated prose was copied into this
-  submission. GenAI was used to iterate on document structure and the final 
+  submission. GenAI was used to iterate on the code structure and the final 
   text was written, edited, and verified entirely by the author.
 - *Methodological ownership:* All substantive analytical decisions,
   including model selection, hyperparameter grid definitions, cross-
