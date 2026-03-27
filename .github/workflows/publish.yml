@@ -57,7 +57,7 @@ jobs:
         
       # -- Render all formats -----------------------------------
       - name: Render Quarto project
-        run: quarto render quarto/index.qmd
+        run: quarto render index.qmd
 
       # -- Upload artifact for Pages ----------------------------
       - name: Upload Pages artifact
