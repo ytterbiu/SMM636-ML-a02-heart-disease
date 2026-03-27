@@ -3,15 +3,13 @@ name: Build and Deploy Quarto Site
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # allows manual trigger from GitHub
+  workflow_dispatch:
 
-# Sets permissions for GITHUB_TOKEN to allow deployment
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Only allow one deployment at a time
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -20,11 +18,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # -- Checkout repo ----------------------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
-      # -- Install Python + dependencies ------------------------
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -48,38 +44,26 @@ jobs:
         run: |
           Rscript -e 'install.packages(c("knitr", "rmarkdown", "kableExtra", "tibble"), repos = "https://cloud.r-project.org")'
 
-      # -- Install Quarto ---------------------------------------
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
 
-      # -- Install system fonts ---------------------------------
-      # If using system-installed fonts (Roboto, Source Code Pro)
-      # For Libertinus from fonts/ dir, fontspec Path= handles it
       - name: Install fonts
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y fonts-roboto fonts-liberation
-          # If Source Code Pro isn't available via apt:
-          # wget -q https://github.com/adobe-fonts/source-code-pro/releases/download/2.042R-u/1.062R-i/1.026R-vf/OTF-source-code-pro-2.042R-u_1.062R-i.zip
-          # unzip -q OTF-source-code-pro-*.zip -d /usr/local/share/fonts/
-          # fc-cache -f
           fc-cache -f
 
-      # -- Install TeX Live for PDF -----------------------------
       - name: Install Quarto TinyTeX
         run: quarto install tinytex
-        
-      # -- Render all formats -----------------------------------
+
       - name: Render Quarto project
         run: quarto render index.qmd
 
-      # -- Upload artifact for Pages ----------------------------
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: quarto/_output
+          path: _site
 
-  # -- Deploy to GitHub Pages -----------------------------------
   deploy:
     needs: build
     runs-on: ubuntu-latest
