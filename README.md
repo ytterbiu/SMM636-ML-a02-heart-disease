@@ -6,8 +6,8 @@ Term 2 individual project for Machine Learning (50% of coursework grade). This
 was part of a project at Bayes Business School (Term 2 2025-26) for module
 SMM636 Machine Learning.
 
-> [!IMPORTANT]
-> HTML report: https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
+> [!IMPORTANT] HTML report:
+> https://ytterbiu.github.io/SMM636-ML-a02-heart-disease/
 
 ## Project structure
 
@@ -27,10 +27,15 @@ SMM636 Machine Learning.
 └── README.md
 ```
 
-
 ## Rendering
 
-Using make file (easiest)
+Using quarto preview (easiest)
+
+```zsh
+quarto preview index.qmd
+```
+
+Using make file
 
 ```zsh
 make            # Build all formats (HTML, Word, PDF) + print word count
@@ -71,8 +76,7 @@ cd quarto/_site && TEXINPUTS=".:..:$TEXINPUTS" latexmk \
 ## Workflow
 
 The Jupyter notebook (`ml-smm636-a02-heart-disease.ipynb`) is the source of the
-analysis code. Easier to work with a notebook, but it's not accepted for
-the submission so a `.py` submission file is generated from it:
+analysis code. To generate a `.py` file from notebook use:
 
 ```zsh
 make py
@@ -115,20 +119,35 @@ git branch -D dev
 git checkout -b dev
 ```
 
-> [!NOTE]
-> After a squash-merge, individual `dev` commits do not appear in
+> [!NOTE] After a squash-merge, individual `dev` commits do not appear in
 > `main`'s public history — only the single squash commit does. The detailed
 > trail is preserved locally on `dev`.
 
 ## Dataset
 
 The Western Cape heart disease dataset contains 462 observations of adult males
-with 9 clinical/behavioural predictors and a binary target (`chd`). Source:
-Rousseauw et al. (1983).
+with 9 clinical/behavioural predictors and a binary target (`chd`).
 
-- https://search.r-project.org/CRAN/refmans/loon.data/html/SAheart.html
+**Source:** Rossouw et al. (1983). *Coronary Risk Factor Screening in Three Rural Communities: The CORIS Baseline Study*. South African Medical Journal.
 
-- !Add full ref
+<details>
+<summary><strong>Click to view BibTeX citation</strong></summary>
+
+```bibtex
+@article{rossouw1983,
+  title   = {Coronary Risk Factor Screening in Three Rural Communities: 
+             The {CORIS} Baseline Study},
+  author  = {Rossouw, J. E. and Du Plessis, J. P. and Benad\'{e}, A. J. S. 
+             and Jordaan, P. C. J. and Kotz\'{e}, J. P. and Jooste, P. L. 
+             and Ferreira, J. J.},
+  journal = {South African Medical Journal},
+  volume  = {64},
+  pages   = {430--436},
+  year    = {1983},
+  url     = {https://journals.co.za/doi/epdf/10.10520/AJA20785135_9894}
+}
+```
+</details>
 
 | Feature     | Description                         |
 | ----------- | ----------------------------------- |
@@ -145,24 +164,8 @@ Rousseauw et al. (1983).
 
 ## Requirements
 
-### Python
-
-Using a virtual environment:
-
-```zsh
-python -m venv .venv
-source .venv/bin/activate               # macOS / Linux
-.venv/bin/python -m pip install numpy pandas matplotlib seaborn scikit-learn jupyter
-```
+See `requirements.txt`.
 
 ## GitHub Pages
 
-The site deploys automatically via GitHub Actions on push to `main`. See
-[DEPLOY.md](DEPLOY.md) for setup instructions.
-
-To publish manually:
-
-```zsh
-make                                    # build all formats first
-quarto publish gh-pages quarto/index.qmd
-```
+The site deploys automatically via GitHub Actions on push to `main`.
