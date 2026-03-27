@@ -34,6 +34,15 @@ jobs:
         run: |
           pip install numpy pandas matplotlib seaborn scikit-learn jupyter
 
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.4.0'
+
+      - name: Install R packages
+        run: |
+          Rscript -e 'install.packages(c("knitr", "rmarkdown", "kableExtra", "tibble"), repos = "https://cloud.r-project.org")'
+
       # -- Install Quarto ---------------------------------------
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
